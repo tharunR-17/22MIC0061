@@ -1,18 +1,23 @@
-```markdown
 # Stage 1: API Design & Real-Time Mechanism
 
-### Core Actions
+## Core Actions
 1. Fetch notifications (with pagination and filtering).
 2. Mark a specific notification as read.
 3. Mark all notifications as read.
 
-### REST API Endpoints
+---
 
-**1. Fetch Notifications**
-* **Endpoint:** `GET /api/v1/notifications`
-* **Headers:** `Authorization: Bearer <token>`
-* **Query Params:** `page` (int), `limit` (int), `notification_type` (enum: Event, Result, Placement)
-* **Response (200 OK):**
+## REST API Endpoints
+
+### 1. Fetch Notifications
+**Endpoint:** `GET /api/v1/notifications`  
+**Headers:** `Authorization: Bearer <token>`  
+**Query Params:**
+- `page` (int)
+- `limit` (int)
+- `notification_type` (enum: Event, Result, Placement)
+
+**Response (200 OK):**
 ```json
 {
   "data": [
@@ -26,7 +31,6 @@
   ],
   "meta": { "total": 50, "page": 1, "limit": 10 }
 }
-
 ```
 
 **2. Mark Notification as Read**
@@ -195,7 +199,5 @@ function process_queue_worker(event):
         # If email fails, the queue automatically retries it later
         # without affecting other students.
         requeue_message_with_delay(event)
-
-```
 
 ```
