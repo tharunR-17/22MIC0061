@@ -1,18 +1,23 @@
-```markdown
 # Stage 1: API Design & Real-Time Mechanism
 
-### Core Actions
+## Core Actions
 1. Fetch notifications (with pagination and filtering).
 2. Mark a specific notification as read.
 3. Mark all notifications as read.
 
-### REST API Endpoints
+---
 
-**1. Fetch Notifications**
-* **Endpoint:** `GET /api/v1/notifications`
-* **Headers:** `Authorization: Bearer <token>`
-* **Query Params:** `page` (int), `limit` (int), `notification_type` (enum: Event, Result, Placement)
-* **Response (200 OK):**
+## REST API Endpoints
+
+### 1. Fetch Notifications
+**Endpoint:** `GET /api/v1/notifications`  
+**Headers:** `Authorization: Bearer <token>`  
+**Query Params:**
+- `page` (int)
+- `limit` (int)
+- `notification_type` (enum: Event, Result, Placement)
+
+**Response (200 OK):**
 ```json
 {
   "data": [
@@ -26,7 +31,6 @@
   ],
   "meta": { "total": 50, "page": 1, "limit": 10 }
 }
-
 ```
 
 **2. Mark Notification as Read**
@@ -198,4 +202,19 @@ function process_queue_worker(event):
 
 ```
 
-```
+# Stage 6: Priority Inbox Algorithm
+
+### Approach
+To calculate priority, I established a custom comparative sorting logic based on two factors:
+1. **Weight:** Assigned integer values to types (`Placement: 3`, `Result: 2`, `Event: 1`).
+2. **Recency:** Converted timestamps to epoch milliseconds. 
+
+The sorting algorithm evaluates weight first. If the weights are identical, it falls back to evaluating the recency.
+
+### Handling Continuous Streams Efficiently
+As new notifications continuously arrive, re-sorting the entire database history is highly inefficient. 
+
+To maintain the top 10 efficiently, I implemented a **Bounded Priority Queue** (represented in the code via a size-capped sorted array). 
+* As each new notification arrives, it is inserted into the array and sorted.
+* If the array length exceeds `n` (e.g., 10), the lowest priority item at the end of the array is immediately popped off.
+* **Time Complexity:** Because the array size never exceeds `n` (a tiny constant like 10), the time complexity to insert and maintain the priority list is effectively **O(1)**. Space complexity is also **O(1)** as we only keep 10 items in memory at a time.
